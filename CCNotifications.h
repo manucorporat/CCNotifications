@@ -52,7 +52,6 @@ enum {
 	
 	CCIntervalAction *animationIn_;
 	CCIntervalAction *animationOut_;
-	CCTimer *timer_;
 }
 @property(nonatomic, retain) id <CCNotificationsDelegate> delegate;
 @property(nonatomic, retain) CCIntervalAction *animationIn;
@@ -65,8 +64,9 @@ enum {
 - (void) setAnimationOut:(char)type time:(ccTime)time;
 - (void) setAnimation:(char)type time:(ccTime)time;
 - (void) updateAnimations;
-- (void) addNotificationTitle:(NSString*)title message:(NSString*)message texture:(CCTexture2D*)texture tag:(int)tag animate:(BOOL)animate;
-- (void) addNotificationTitle:(NSString*)title message:(NSString*)message image:(NSString*)image tag:(int)tag animate:(BOOL)animate;
+- (void) addSafelyWithTitle:(NSString*)title message:(NSString*)message image:(NSString*)image tag:(int)tag animate:(BOOL)animate;
+- (void) addWithTitle:(NSString*)title message:(NSString*)message texture:(CCTexture2D*)texture tag:(int)tag animate:(BOOL)animate;
+- (void) addWithTitle:(NSString*)title message:(NSString*)message image:(NSString*)image tag:(int)tag animate:(BOOL)animate;
 - (void) registerWithTouchDispatcher;
 - (void) visit;
 @end
