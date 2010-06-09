@@ -1,0 +1,19 @@
+//
+//  CCNotifications
+//
+//  Created by Manuel Martinez-Almeida Castañeda.
+//  Copyright 2010 Abstraction Works. All rights reserved.
+//	http://www.abstractionworks.com
+//
+
+CCNotifications needs cocos2d to work.
+http://www.cocos2d-iphone.org
+
+Please read this article to integrate CCNotifications in your game easily:
+http://www.cocos2d-iphone.org/archives/804
+
+Forum discussion:
+http://www.cocos2d-iphone.org/forum/topic/5269
+
+Source code:
+http://github.com/manucorporat/CCNotifications
