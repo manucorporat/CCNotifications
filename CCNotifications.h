@@ -1,10 +1,9 @@
 //
-//  CCNotifications.h
-//  FullVersion
+//  CCNotifications
 //
-//  Created by Manuel Martinez-Almeida Castañeda on 21/03/10.
-//  Copyright 2010 Manuel Martínez-Almeida. All rights reserved.
-//	http://manucorporat.wordpress.com
+//  Created by Manuel Martinez-Almeida Castañeda.
+//  Copyright 2010 Abstraction Works. All rights reserved.
+//	http://www.abstractionworks.com
 //
 
 #import <Foundation/Foundation.h>
