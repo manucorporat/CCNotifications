@@ -9,35 +9,13 @@
 #import "CCNotifications.h"
 #import "notificationDesign.h"
 
-@interface CCNotifications (Private)
-
-- (CCIntervalAction*) animation:(char)type time:(ccTime)time;
-- (void) hideNotificationScheduler;
-- (void) setState:(char)states;
-
-@end
-
-@interface ccNotificationData : NSObject {
-	NSString *title_;
-	NSString *message_;
-	NSString *image_;
-	int tag_;
-	BOOL animated_;
-}
-@property(nonatomic, retain) NSString *title;
-@property(nonatomic, retain) NSString *message;
-@property(nonatomic, retain) NSString *image;
-@property(nonatomic, readwrite, assign) int tag;
-@property(nonatomic, readwrite, assign) BOOL animated;
-
-@end
 
 @implementation ccNotificationData
-@synthesize title = title_;
-@synthesize message = message_;
-@synthesize image = image_;
-@synthesize tag = tag_;
-@synthesize animated = animated_;
+@synthesize title		= title_;
+@synthesize message		= message_;
+@synthesize image		= image_;
+@synthesize tag			= tag_;
+@synthesize animated	= animated_;
 
 
 - (void) dealloc
@@ -51,11 +29,28 @@
 
 @end
 
+@interface CCNotifications (Private)
+
+- (void) _updateAnimationIn;
+- (void) _updateAnimationOut;
+- (CCIntervalAction*) _animation:(char)type time:(ccTime)time;
+- (void) _addFromSafelyMode;
+- (void) _startScheduler;
+- (void) _hideNotification;
+- (void) _hideNotificationScheduler;
+- (void) registerWithTouchDispatcher;
+- (void) _setState:(char)states;
+
+@end
+
+
 @implementation CCNotifications
-@synthesize animationIn = animationIn_;
-@synthesize animationOut = animationOut_;
-@synthesize delegate = delegate_;
-@synthesize showingTime = showingTime_;
+@synthesize notificationDesign		= template_;
+@synthesize animationIn				= animationIn_;
+@synthesize animationOut			= animationOut_;
+@synthesize delegate				= delegate_;
+@synthesize showingTime				= showingTime_;
+@synthesize cachedNotificationData	= cachedNotificationData_;
 
 static CCNotifications *sharedManager;
 
@@ -73,17 +68,33 @@ static CCNotifications *sharedManager;
 	return [super alloc];
 }
 
++ (id) systemWithTemplate:(CCNode <CCNotificationDesignProtocol> *)notifications
+{
+	NSAssert(sharedManager == nil, @"Attempted to allocate a second instance of a singleton. You should use setTemplate");
+	sharedManager = [[CCNotifications alloc] initWithTemplate:notifications];
+	
+	return sharedManager;
+}
+
 +(void)purgeSharedManager
 {
 	[sharedManager release];
 }
 
--(id) init
+- (id) init
 {
-	if( (self=[super init]) ) {
-		notification = [[CCNotificationDefaultDesign alloc] init];
-		[notification setIsRelativeAnchorPoint:YES];
-		[notification setVisible:NO];
+	CCNode <CCNotificationDesignProtocol> *templates = [[[CCNotificationDefaultDesign alloc] init] autorelease];
+	return self = [self initWithTemplate:templates];
+}
+
+
+-(id) initWithTemplate:(CCNode <CCNotificationDesignProtocol> *)templates
+{
+	if( (self = [super init]) ) {
+		self.notificationDesign = templates;
+		cachedNotificationData_ = nil;
+		[template_ setIsRelativeAnchorPoint:YES];
+		[template_ setVisible:NO];
 		
 		delegate_			= nil;
 		tag_				= -1;
@@ -104,9 +115,11 @@ static CCNotifications *sharedManager;
 	return self;
 }
 
-- (void) setState:(char)states{
+- (void) _setState:(char)states{
 	if(state_==states) return;
-	[delegate_ notificationChangeState:states tag:tag_];
+	if([delegate_ respondsToSelector:@selector(notificationChangeState:tag:)])
+		[delegate_ notificationChangeState:states tag:tag_];
+	
 	state_ = states;
 }
 
@@ -115,49 +128,68 @@ static CCNotifications *sharedManager;
 	[self updateAnimations];
 }
 
+- (void) setNotificationDesign:(CCNode <CCNotificationDesignProtocol>*) templates
+{
+	if(state_!=kCCNotificationStateHide)
+		[template_ stopAllActions];
+
+	if(state_==kCCNotificationStateShowing){
+		[[CCTouchDispatcher sharedDispatcher] removeDelegate:self];
+		[[CCScheduler sharedScheduler] unscheduleSelector:@selector(_hideNotificationScheduler) forTarget:self];		
+	}
+	[templates retain];
+	[template_ release];
+	template_ = templates;
+	
+	[self _setState:kCCNotificationStateHide];
+}
 #pragma mark Notification Actions
 
-- (CCIntervalAction*) animation:(char)type time:(ccTime)time{
+- (CCIntervalAction*) _animation:(char)type time:(ccTime)time{
 	CCIntervalAction *action = nil;
 	switch (type) {
 		case kCCNotificationAnimationMovement:
 			if(position_==kCCNotificationPositionBottom)
-				action = [CCMoveBy actionWithDuration:time position:ccp(0, notification.contentSize.height)];
+				action = [CCMoveBy actionWithDuration:time position:ccp(0, template_.contentSize.height)];
 			else if(position_ == kCCNotificationPositionTop)
-				action = [CCMoveBy actionWithDuration:time position:ccp(0, -notification.contentSize.height)];
+				action = [CCMoveBy actionWithDuration:time position:ccp(0, -template_.contentSize.height)];
+			
 			break;
 		case kCCNotificationAnimationScale:
 			action = [CCScaleBy actionWithDuration:time scale:(1.0f-KNOTIFICATIONMIN_SCALE)/KNOTIFICATIONMIN_SCALE];
+			
 			break;
 		default: break;
 	}
 	return action;
 }
 
-- (void) updateAnimationIn{
-	self.animationIn = [CCSequence actionOne:[self animation:typeAnimationIn_ time:timeAnimationIn_] two:[CCCallFunc actionWithTarget:self selector:@selector(startScheduler)]];
+- (void) _updateAnimationIn
+{
+	self.animationIn = [CCSequence actionOne:[self _animation:typeAnimationIn_ time:timeAnimationIn_] two:[CCCallFunc actionWithTarget:self selector:@selector(_startScheduler)]];
 }
 
-- (void) updateAnimationOut{
-	CCIntervalAction *tempAction = [self animation:typeAnimationOut_ time:timeAnimationOut_];
-	self.animationOut = [CCSequence actionOne:[tempAction reverse] two:[CCCallFunc actionWithTarget:self selector:@selector(hideNotification)]];
+- (void) _updateAnimationOut
+{
+	CCIntervalAction *tempAction = [self _animation:typeAnimationOut_ time:timeAnimationOut_];
+	self.animationOut = [CCSequence actionOne:[tempAction reverse] two:[CCCallFunc actionWithTarget:self selector:@selector(_hideNotification)]];
 }
 
 - (void) updateAnimations{
-	[self updateAnimationIn];
-	[self updateAnimationOut];
+	[self _updateAnimationIn];
+	[self _updateAnimationOut];
 }
 
 - (void) setAnimationIn:(char)type time:(ccTime)time{
 	typeAnimationIn_ = type;
 	timeAnimationIn_ = time;
-	[self updateAnimationIn];
+	[self _updateAnimationIn];
 }
 
 - (void) setAnimationOut:(char)type time:(ccTime)time{
 	typeAnimationOut_ = type;
 	timeAnimationOut_ = time;
-	[self updateAnimationOut];
+	[self _updateAnimationOut];
 }
 
 - (void) setAnimation:(char)type time:(ccTime)time{
@@ -168,40 +200,43 @@ static CCNotifications *sharedManager;
 
 #pragma mark Notification steps
 
-- (void) startScheduler{
+- (void) _startScheduler
+{
 	[self registerWithTouchDispatcher];
-	[self setState:kCCNotificationStateShowing];
-	[notification stopAllActions];
-	[[CCScheduler sharedScheduler] scheduleSelector:@selector(hideNotificationScheduler) forTarget:self interval:showingTime_ paused:NO];
+	[self _setState:kCCNotificationStateShowing];
+	[template_ stopAllActions];
+	[[CCScheduler sharedScheduler] scheduleSelector:@selector(_hideNotificationScheduler) forTarget:self interval:showingTime_ paused:NO];
 }
 
-- (void) hideNotification{
-	[self setState:kCCNotificationStateHide];
-	[notification setVisible:NO];
-	[notification stopAllActions];
-	[notification onExit];
+- (void) _hideNotification
+{
+	[self _setState:kCCNotificationStateHide];
+	[template_ setVisible:NO];
+	[template_ stopAllActions];
+	[template_ onExit];
 }
 
-- (void) hideNotificationScheduler{
-	
+- (void) _hideNotificationScheduler
+{	
 	[[CCTouchDispatcher sharedDispatcher] removeDelegate:self];
-	[[CCScheduler sharedScheduler] unscheduleSelector:@selector(hideNotificationScheduler) forTarget:self];
+	[[CCScheduler sharedScheduler] unscheduleSelector:@selector(_hideNotificationScheduler) forTarget:self];
 	if(animated_){
-		[self setState:kCCNotificationStateAnimationOut];
-		[notification runAction:animationOut_];
+		[self _setState:kCCNotificationStateAnimationOut];
+		[template_ runAction:animationOut_];
 	}else
-		[self hideNotification];
+		[self _hideNotification];
 }
 
 #pragma mark Manager Notifications
 
-- (void) addWithTitle:(NSString*)title message:(NSString*)message texture:(CCTexture2D*)texture tag:(int)tag animate:(BOOL)animate{
+- (void) addWithTitle:(NSString*)title message:(NSString*)message texture:(CCTexture2D*)texture tag:(int)tag animate:(BOOL)animate
+{
 	if(state_!=kCCNotificationStateHide){
 		[delegate_ notificationChangeState:kCCNotificationStateHide tag:tag_];
-		[notification setVisible:NO];
-		[notification stopAllActions];
-		[notification onExit];
-		[[CCScheduler sharedScheduler] unscheduleSelector:@selector(hideNotificationScheduler) forTarget:self];
+		[template_ setVisible:NO];
+		[template_ stopAllActions];
+		[template_ onExit];
+		[[CCScheduler sharedScheduler] unscheduleSelector:@selector(_hideNotificationScheduler) forTarget:self];
 	}
 	
 	if(state_==kCCNotificationStateShowing)
@@ -209,98 +244,113 @@ static CCNotifications *sharedManager;
 	
 	tag_		= tag;
 	animated_	= animate;
-	[notification setVisible:NO];
-	[notification stopAllActions];
-	[notification onExit];
+	[template_ setVisible:NO];
+	[template_ stopAllActions];
+	[template_ onExit];
 	
 	CGSize winSize = [[CCDirector sharedDirector] winSize];
 	if(animate){
 		if(position_==kCCNotificationPositionBottom){
-			[notification setAnchorPoint:ccp(0.5f, 0)];
+			[template_ setAnchorPoint:ccp(0.5f, 0)];
 			switch (typeAnimationIn_) {
 				case kCCNotificationAnimationMovement:
-					[notification setScale:1.0f];
-					[notification setPosition:ccp(winSize.width/2.0f, -notification.contentSize.height)];
+					[template_ setScale:1.0f];
+					[template_ setPosition:ccp(winSize.width/2.0f, -template_.contentSize.height)];
+					
 					break;
 				case kCCNotificationAnimationScale:
-					[notification setScale:KNOTIFICATIONMIN_SCALE];
-					[notification setPosition:ccp(winSize.width/2.0f, 0)];
+					[template_ setScale:KNOTIFICATIONMIN_SCALE];
+					[template_ setPosition:ccp(winSize.width/2.0f, 0)];
+					
 					break;
 				default: return;
 			}
 			
 		}else if(position_==kCCNotificationPositionTop){
-			[notification setAnchorPoint:ccp(0.5f, 1)];
+			[template_ setAnchorPoint:ccp(0.5f, 1)];
 			switch (typeAnimationIn_) {
 				case kCCNotificationAnimationMovement:
-					[notification setScale:1.0f];
-					[notification setPosition:ccp(winSize.width/2.0f, winSize.height+notification.contentSize.height)];
+					[template_ setScale:1.0f];
+					[template_ setPosition:ccp(winSize.width/2.0f, winSize.height+template_.contentSize.height)];
+					
 					break;
 				case kCCNotificationAnimationScale:
-					[notification setScale:KNOTIFICATIONMIN_SCALE];
-					[notification setPosition:ccp(winSize.width/2.0f, winSize.height)];
+					[template_ setScale:KNOTIFICATIONMIN_SCALE];
+					[template_ setPosition:ccp(winSize.width/2.0f, winSize.height)];
+					
 					break;
 				default: return;
 			}
 		}
-		[self setState:kCCNotificationStateAnimationIn];
-		[notification onEnter];
-		[notification runAction:animationIn_];
+		[self _setState:kCCNotificationStateAnimationIn];
+		[template_ onEnter];
+		[template_ runAction:animationIn_];
 		
 	}else{
-		if(position_==kCCNotificationPositionBottom){
-			[notification setAnchorPoint:ccp(0.5f, 0)];
-			[notification setPosition:ccp(winSize.width/2.0f, 0)];
-		}else if(position_==kCCNotificationPositionTop){
-			[notification setAnchorPoint:ccp(0.5f, 1)];
-			[notification setPosition:ccp(winSize.width/2.0f, winSize.height)];
+		if(position_==kCCNotificationPositionBottom)
+		{
+			[template_ setAnchorPoint:ccp(0.5f, 0)];
+			[template_ setPosition:ccp(winSize.width/2.0f, 0)];
+		}else if(position_==kCCNotificationPositionTop)
+		{
+			[template_ setAnchorPoint:ccp(0.5f, 1)];
+			[template_ setPosition:ccp(winSize.width/2.0f, winSize.height)];
 		}
-		[self startScheduler];
+		[self _startScheduler];
 	}
-	[notification setTitle:title message:message texture:texture];
-	[notification setVisible:YES];
+	[template_ setTitle:title message:message texture:texture];
+	[template_ setVisible:YES];
 }
 
-- (void) addWithTitle:(NSString*)title message:(NSString*)message image:(NSString*)image tag:(int)tag animate:(BOOL)animate{
+- (void) addWithTitle:(NSString*)title message:(NSString*)message image:(NSString*)image tag:(int)tag animate:(BOOL)animate
+{
 	CCTexture2D *texture = (image==nil) ? nil : [[CCTextureCache sharedTextureCache] addImage:image];
 	[self addWithTitle:title message:message texture:texture tag:tag animate:animate];
 }
 
-- (void) _addFromSafelyMode:(ccNotificationData*)data{
+- (void) _addFromSafelyMode
+{
+	ccNotificationData *data = self.cachedNotificationData;
 	[self addWithTitle:data.title message:data.message image:data.image tag:data.tag animate:data.animated];
-	[data release];
+	self.cachedNotificationData = nil;
 }
 
-- (void) addSafelyWithTitle:(NSString*)title message:(NSString*)message image:(NSString*)image tag:(int)tag animate:(BOOL)animate{
+- (void) addSafelyWithTitle:(NSString*)title message:(NSString*)message image:(NSString*)image tag:(int)tag animate:(BOOL)animate
+{
 	ccNotificationData *data = [[ccNotificationData alloc] init];
-	data.title = title;
-	data.message = message;
-	data.image = image;
-	data.tag = tag;
-	data.animated = animate;
-	[self performSelectorOnMainThread:@selector(_addFromSafelyMode:) withObject:data waitUntilDone:YES];
+	data.title		= title;
+	data.message	= message;
+	data.image		= image;
+	data.tag		= tag;
+	data.animated	= animate;
+	self.cachedNotificationData = data; //2 retains
+	[data release]; //1 retain
 }
 
 #pragma mark Touch Events
 
--(void) registerWithTouchDispatcher
+- (void) registerWithTouchDispatcher
 {
 	[[CCTouchDispatcher sharedDispatcher] addStandardDelegate:self priority:INT_MIN+3];
 }
 
-- (void)ccTouchesEnded:(NSSet *)touches withEvent:(UIEvent *)event{
+- (void) ccTouchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
 	UITouch *touch = [touches anyObject];
 	CGPoint point = [[CCDirector sharedDirector] convertToGL:[touch locationInView:[touch view]]];
-	CGRect rect = [notification boundingBox];
+	CGRect rect = [template_ boundingBox];
 	if(CGRectContainsPoint(rect, point))
-		if([delegate_ touched:tag_])
-			[self hideNotificationScheduler];
+		if([delegate_ respondsToSelector:@selector(touched:)] && [delegate_ touched:tag_])
+			[self _hideNotificationScheduler];
 }
 
 #pragma mark Other methods
 
 - (void) visit{
-	[notification visit];
+	if(cachedNotificationData_)
+		[self _addFromSafelyMode];
+	
+	[template_ visit];
 }
 
 - (NSString*) description
@@ -313,10 +363,11 @@ static CCNotifications *sharedManager;
 	CCLOG(@"cocos2d: deallocing %@", self);
 	
 	sharedManager = nil;
-	[notification release];
+	[self setNotificationDesign:nil];
 	[self setDelegate:nil];
 	[self setAnimationIn:nil];
 	[self setAnimationOut:nil];
+	[self setCachedNotificationData:nil];
 	[super dealloc];
 }
 @end

@@ -10,7 +10,7 @@
 #import "CCNotifications.h"
 #import "cocos2d.h"
 
-@interface CCNotificationDefaultDesign : CCColorLayer <CCNotificationsDesignProtocol>
+@interface CCNotificationDefaultDesign : CCColorLayer <CCNotificationDesignProtocol>
 {
 	CCLabel *title_;
 	CCLabel *message_;
