@@ -51,6 +51,7 @@
 
 - (void) updateColor
 {
+	//Gradient code
 	ccColor3B colorFinal = ccc3(0, 50, 100);
 	
 	squareColors[0] = color_.r;
