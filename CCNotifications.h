@@ -23,7 +23,7 @@
 
 enum
 {
-	kCCNotificationStateHide,
+	kCCNotificationStateHide = 0,
 	kCCNotificationStateAnimationOut,
 	kCCNotificationStateShowing,
 	kCCNotificationStateAnimationIn,
@@ -31,13 +31,13 @@ enum
 
 enum
 {
-	kCCNotificationPositionBottom,
+	kCCNotificationPositionBottom = 0,
 	kCCNotificationPositionTop,
 };
 
 enum
 {
-	kCCNotificationAnimationMovement,
+	kCCNotificationAnimationMovement = 0,
 	kCCNotificationAnimationScale,
 };
 
@@ -63,7 +63,7 @@ enum
 	CCNode <CCNotificationDesignProtocol>	*template_;
 	ccNotificationData						*cachedNotificationData_;
 	char									state_;
-	char									position_;
+	int									position_;
 	int										tag_;
 	ccTime									showingTime_;
 	ccTime									timeAnimationIn_;
@@ -80,6 +80,7 @@ enum
 @property(nonatomic, retain) CCIntervalAction *animationIn;
 @property(nonatomic, retain) CCIntervalAction *animationOut;
 @property(nonatomic, retain) ccNotificationData *cachedNotificationData;
+@property(nonatomic, readwrite, assign) int position;
 @property(nonatomic, readwrite, assign) ccTime showingTime;
 
 + (CCNotifications *) sharedManager;

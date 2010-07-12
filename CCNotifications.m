@@ -45,6 +45,7 @@
 
 
 @implementation CCNotifications
+@synthesize position				= position_;
 @synthesize notificationDesign		= template_;
 @synthesize animationIn				= animationIn_;
 @synthesize animationOut			= animationOut_;
@@ -122,9 +123,9 @@ static CCNotifications *sharedManager;
 	state_ = states;
 }
 
-- (void) setPosition:(char)position
+- (void) setPosition:(char)positions
 {
-	position_ = position;
+	position_ = positions;
 	[self updateAnimations];
 }
 
