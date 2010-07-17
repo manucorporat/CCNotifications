@@ -43,15 +43,39 @@
 	// Turn on multiple touches
 	EAGLView *view = [director openGLView];
 	[view setMultipleTouchEnabled:YES];
+
+	/** INIT OPENFEINT 
+
+	 //Openfeint init
+	 NSDictionary* settings = [NSDictionary dictionaryWithObjectsAndKeys:
+	 [NSNumber numberWithInt:UIInterfaceOrientationLandscapeRight], OpenFeintSettingDashboardOrientation,
+	 [NSNumber numberWithBool:YES], OpenFeintSettingEnablePushNotifications,
+	 nil
+	 ];
+	 
+	 OFDelegatesContainer* delegates = [OFDelegatesContainer
+	 containerWithOpenFeintDelegate:self
+	 andChallengeDelegate:nil
+	 andNotificationDelegate:self];
+	 
+	 [OpenFeint initializeWithProductKey:@"blablbla"
+	 andSecret:@"blablabla"
+	 andDisplayName:@"blablabla"
+	 andSettings:settings
+	 andDelegates:delegates];
+	 */
+	
 	
 	// Default texture format for PNG/BMP/TIFF/JPEG/GIF images
 	// It can be RGBA8888, RGBA4444, RGB5_A1, RGB565
 	// You can change anytime.
-	[CCTexture2D setDefaultAlphaPixelFormat:kTexture2DPixelFormat_RGBA8888];
+	[CCTexture2D setDefaultAlphaPixelFormat:kTexture2DPixelFormat_RGBA8888];	
 	
-	// Init CCNotifications (very easy)
-	[[CCNotifications sharedManager] setDelegate:self];
 	
+	
+	/** Init CCNotifications (very easy) **/
+	[[CCNotifications sharedManager] setDelegate:self];	
+
 		
 	[[CCDirector sharedDirector] runWithScene: [HelloWorld scene]];
 }
@@ -101,18 +125,16 @@
 
 /*
 - (BOOL) isOpenFeintNotificationAllowed:(OFNotificationData*)notificationData
-{
+{	 
 	return NO;
 }
 
 - (void)handleDisallowedNotification:(OFNotificationData*)notificationData
 {
 	//Using safety mode (You can send notification from any thread
-	[[CCNotifications sharedManager] addSafelyWithTitle:@"Openfeint:" message:[notificationData notificationText] image:@"YOUR IMAGE EXAMPLE" tag:tag animate:YES];
+	[[CCNotifications sharedManager] addSafelyWithTitle:@"Openfeint:" message:[notificationData notificationText] image:@"YOUR IMAGE EXAMPLE" tag:-1 animate:YES];
 }
- */
-
-
+*/
 
 #pragma mark App state methods
 

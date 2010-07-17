@@ -98,10 +98,10 @@ static CCNotifications *sharedManager;
 		delegate_			= nil;
 		tag_				= -1;
 		state_				= kCCNotificationStateHide;
-		typeAnimationIn_	= 0;
-		typeAnimationOut_	= 0;
-		timeAnimationIn_	= 0;
-		timeAnimationOut_	= 0;
+		typeAnimationIn_	= kCCNotificationAnimationMovement;
+		typeAnimationOut_	= kCCNotificationAnimationMovement;
+		timeAnimationIn_	= 0.0f;
+		timeAnimationOut_	= 0.0f;
 		
 		//Default settings
 		showingTime_		= 4.0f;

@@ -283,7 +283,7 @@
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
-							<string>{{0, 1732}, {185, 646}}</string>
+							<string>{{0, 0}, {185, 646}}</string>
 						</dict>
 						<key>PBXTopSmartGroupGIDs</key>
 						<array/>
@@ -300,7 +300,7 @@
 							<real>185</real>
 						</array>
 						<key>RubberWindowFrame</key>
-						<string>137 56 1078 705 0 0 1280 778 </string>
+						<string>137 60 1078 705 0 0 1280 778 </string>
 					</dict>
 					<key>Module</key>
 					<string>PBXSmartGroupTreeModule</string>
@@ -330,7 +330,7 @@
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>99E970DF11EB796000A52C62</string>
+										<string>99E970E011EBB37700A52C62</string>
 										<key>history</key>
 										<array>
 											<string>99E96FE211EB696500A52C62</string>
@@ -361,7 +361,7 @@
 								<key>Frame</key>
 								<string>{{0, 0}, {871, 537}}</string>
 								<key>RubberWindowFrame</key>
-								<string>137 56 1078 705 0 0 1280 778 </string>
+								<string>137 60 1078 705 0 0 1280 778 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
@@ -386,7 +386,7 @@
 										<key>Frame</key>
 										<string>{{10, 27}, {871, 95}}</string>
 										<key>RubberWindowFrame</key>
-										<string>137 56 1078 705 0 0 1280 778 </string>
+										<string>137 60 1078 705 0 0 1280 778 </string>
 									</dict>
 									<key>Module</key>
 									<string>XCDetailModule</string>
@@ -663,13 +663,12 @@
 	<integer>5</integer>
 	<key>WindowOrderList</key>
 	<array>
-		<string>99E970DC11EB78CC00A52C62</string>
 		<string>99E9703D11EB6FE800A52C62</string>
 		<string>99E9701911EB6AE600A52C62</string>
 		<string>/Users/manuelmartinez-almeidacastaneda/repos/CCNotifications/Sample/Sample.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
-	<string>137 56 1078 705 0 0 1280 778 </string>
+	<string>137 60 1078 705 0 0 1280 778 </string>
 	<key>WindowToolsV3</key>
 	<array>
 		<dict>

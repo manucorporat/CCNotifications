@@ -53,6 +53,7 @@
 
 		
 		// setPosition
+		[[CCNotifications sharedManager] setPosition:kCCNotificationPositionBottom];
 		CCMenuItem *positionBottom = [CCMenuItemFont itemFromString:@"Bottom"];
 		CCMenuItem *positionTop = [CCMenuItemFont itemFromString:@"Top"];
 		CCMenuItemToggle *positionOptions = [CCMenuItemToggle itemWithTarget:self selector:@selector(setNotPosition:) items:positionBottom, positionTop, nil];

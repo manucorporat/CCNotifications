@@ -63,7 +63,7 @@ enum
 	CCNode <CCNotificationDesignProtocol>	*template_;
 	ccNotificationData						*cachedNotificationData_;
 	char									state_;
-	int									position_;
+	char									position_;
 	int										tag_;
 	ccTime									showingTime_;
 	ccTime									timeAnimationIn_;
@@ -80,7 +80,7 @@ enum
 @property(nonatomic, retain) CCIntervalAction *animationIn;
 @property(nonatomic, retain) CCIntervalAction *animationOut;
 @property(nonatomic, retain) ccNotificationData *cachedNotificationData;
-@property(nonatomic, readwrite, assign) int position;
+@property(nonatomic, readwrite, assign) char position;
 @property(nonatomic, readwrite, assign) ccTime showingTime;
 
 + (CCNotifications *) sharedManager;
