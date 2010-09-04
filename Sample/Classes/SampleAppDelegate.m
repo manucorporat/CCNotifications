@@ -38,7 +38,7 @@
 	[director setDeviceOrientation:kCCDeviceOrientationLandscapeLeft];
 	
 	// Turn on display FPS
-	[director setDisplayFPS:YES];
+	[director setDisplayFPS:NO];
 	
 	// Turn on multiple touches
 	EAGLView *view = [director openGLView];
@@ -83,7 +83,7 @@
 
 #pragma mark CCNotifications delegate methods (optional)
 
-- (void) notificationChangeState:(char)state tag:(int)tag
+- (void) notification:(ccNotificationData*)notification newState:(char)state
 {
 	switch (state) {
 		case kCCNotificationStateHide:

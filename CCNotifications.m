@@ -7,13 +7,15 @@
 //
 
 #import "CCNotifications.h"
+#import "CCArray.h"
 #import "notificationDesign.h"
 
 
 @implementation ccNotificationData
 @synthesize title		= title_;
 @synthesize message		= message_;
-@synthesize image		= image_;
+@synthesize media		= media_;
+@synthesize mediaType	= mediaType_;
 @synthesize tag			= tag_;
 @synthesize animated	= animated_;
 
@@ -22,7 +24,8 @@
 {
 	[self setTitle:nil];
 	[self setMessage:nil];
-	[self setImage:nil];
+	[self setMedia:nil];
+	NSLog(@"Dealloc");
 	[super dealloc];
 }
 
@@ -34,7 +37,8 @@
 - (void) _updateAnimationIn;
 - (void) _updateAnimationOut;
 - (CCIntervalAction*) _animation:(char)type time:(ccTime)time;
-- (void) _addFromSafelyMode;
+- (void) _showNotification;
+- (void) _addNotificationToArray:(ccNotificationData*)data cached:(BOOL)isCached;
 - (void) _startScheduler;
 - (void) _hideNotification;
 - (void) _hideNotificationScheduler;
@@ -51,7 +55,7 @@
 @synthesize animationOut			= animationOut_;
 @synthesize delegate				= delegate_;
 @synthesize showingTime				= showingTime_;
-@synthesize cachedNotificationData	= cachedNotificationData_;
+@synthesize currentNotification		= currentNotification_;
 
 static CCNotifications *sharedManager;
 
@@ -93,15 +97,15 @@ static CCNotifications *sharedManager;
 {
 	if( (self = [super init]) ) {
 		self.notificationDesign = templates;
-		cachedNotificationData_ = nil;
 		
 		delegate_			= nil;
-		tag_				= -1;
 		state_				= kCCNotificationStateHide;
 		typeAnimationIn_	= kCCNotificationAnimationMovement;
 		typeAnimationOut_	= kCCNotificationAnimationMovement;
 		timeAnimationIn_	= 0.0f;
 		timeAnimationOut_	= 0.0f;
+		
+		cachedNotifications_ = [[CCArray alloc] initWithCapacity:4];
 		
 		//Default settings
 		showingTime_		= 4.0f;
@@ -117,10 +121,13 @@ static CCNotifications *sharedManager;
 - (void) _setState:(char)states
 {
 	if(state_==states) return;
-	if([delegate_ respondsToSelector:@selector(notificationChangeState:tag:)])
-		[delegate_ notificationChangeState:states tag:tag_];
-	
 	state_ = states;
+	
+	if([delegate_ respondsToSelector:@selector(notification:newState:)])
+		[delegate_ notification:currentNotification_ newState:state_];
+	
+	if([delegate_ respondsToSelector:@selector(notificationChangeState:tag:)])
+		[delegate_ notificationChangeState:state_ tag:[currentNotification_ tag]];
 }
 
 - (void) setPosition:(char)positions
@@ -225,13 +232,20 @@ static CCNotifications *sharedManager;
 	[template_ setVisible:NO];
 	[template_ stopAllActions];
 	[template_ onExit];
+	
+	//Release current notification
+	[cachedNotifications_ removeObject:currentNotification_];
+	self.currentNotification = nil;
+	
+	//Check next notification
+	[self _showNotification];
 }
 
 - (void) _hideNotificationScheduler
 {	
 	[[CCTouchDispatcher sharedDispatcher] removeDelegate:self];
 	[[CCScheduler sharedScheduler] unscheduleSelector:@selector(_hideNotificationScheduler) forTarget:self];
-	if(animated_)
+	if([currentNotification_ animated])
 	{
 		[self _setState:kCCNotificationStateAnimationOut];
 		[template_ runAction:animationOut_];
@@ -241,28 +255,113 @@ static CCNotifications *sharedManager;
 
 #pragma mark Manager Notifications
 
-- (void) addWithTitle:(NSString*)title message:(NSString*)message texture:(CCTexture2D*)texture tag:(int)tag animate:(BOOL)animate
+- (void) _addNotificationToArray:(ccNotificationData*)data cached:(BOOL)isCached
 {
+	if(isCached)
+	{
+		[cachedNotifications_ addObject:data];
+		if([cachedNotifications_ count]==1)
+			[self _showNotification];
+	}else{
+		if(currentNotification_)
+		{
+			[cachedNotifications_ removeObject:currentNotification_];
+		}
+		[cachedNotifications_ insertObject:data atIndex:0];
+		[self _showNotification];
+	}
+}
+
+- (ccNotificationData*) addWithTitle:(NSString*)title message:(NSString*)message image:(NSString*)image tag:(int)tag animate:(BOOL)animate waitUntilDone:(BOOL)isCached
+{
+	ccNotificationData *data = [[ccNotificationData alloc] init];
+	data.title		= title;
+	data.message	= message;
+	data.media		= image;
+	data.mediaType  = kCCNotificationMediaPath;
+	data.tag		= tag;
+	data.animated	= animate;
+	
+	[self _addNotificationToArray:data cached:isCached];
+	[data release];
+	return data;
+}
+
+- (ccNotificationData*) addWithTitle:(NSString*)title message:(NSString*)message texture:(CCTexture2D*)texture tag:(int)tag animate:(BOOL)animate waitUntilDone:(BOOL)isCached
+{
+	ccNotificationData *data = [[ccNotificationData alloc] init];
+	data.title		= title;
+	data.message	= message;
+	data.media		= texture;
+	data.mediaType  = kCCNotificationMediaTexture;
+	data.tag		= tag;
+	data.animated	= animate;
+	
+	[self _addNotificationToArray:data cached:isCached];
+	[data release];
+	return data;
+}
+
+- (ccNotificationData*) addWithTitle:(NSString*)title message:(NSString*)message image:(NSString*)image tag:(int)tag animate:(BOOL)animate
+{
+	return [self addWithTitle:title message:message image:image tag:tag animate:animate waitUntilDone:YES];
+}
+
+- (ccNotificationData*) addWithTitle:(NSString*)title message:(NSString*)message texture:(CCTexture2D*)texture tag:(int)tag animate:(BOOL)animate
+{
+	return [self addWithTitle:title message:message texture:texture tag:tag animate:animate waitUntilDone:YES];
+}
+
+/* Fast methods */
+
+- (ccNotificationData*) addWithTitle:(NSString*)title message:(NSString*)message image:(NSString*)image
+{
+	return [self addWithTitle:title message:message image:image tag:-1 animate:YES waitUntilDone:YES];
+}
+
+- (ccNotificationData*) addWithTitle:(NSString*)title message:(NSString*)message texture:(CCTexture2D*)texture
+{
+	return [self addWithTitle:title message:message texture:texture tag:-1 animate:YES waitUntilDone:YES];
+}
+
+/* Deprecated */
+- (void) addSafelyWithTitle:(NSString*)title message:(NSString*)message image:(NSString*)image tag:(int)tag animate:(BOOL)animate
+{
+	[self addWithTitle:title message:message image:image tag:tag animate:animate waitUntilDone:YES];
+}
+
+
+- (void) _showNotification
+{
+	if([cachedNotifications_ count]==0) return;
+	//Get notification data
+	self.currentNotification = [cachedNotifications_ objectAtIndex:0];
+	
+	//Stop system
+	if(state_==kCCNotificationStateShowing)
+		[[CCTouchDispatcher sharedDispatcher] removeDelegate:self];
+	
 	if(state_!=kCCNotificationStateHide)
 	{
-		[delegate_ notificationChangeState:kCCNotificationStateHide tag:tag_];
+		[self _setState:kCCNotificationStateHide];
+		
 		[template_ setVisible:NO];
 		[template_ stopAllActions];
 		[template_ onExit];
 		[[CCScheduler sharedScheduler] unscheduleSelector:@selector(_hideNotificationScheduler) forTarget:self];
 	}
 	
-	if(state_==kCCNotificationStateShowing)
-		[[CCTouchDispatcher sharedDispatcher] removeDelegate:self];
+	//Get variables
+	CCTexture2D *texture = (currentNotification_.media) ? ((currentNotification_.mediaType==kCCNotificationMediaTexture) ? (CCTexture2D*)currentNotification_.media : [[CCTextureCache sharedTextureCache] addImage:(NSString*)currentNotification_.media]) : nil;
 	
-	tag_		= tag;
-	animated_	= animate;
+	//Prepare template
 	[template_ setVisible:NO];
 	[template_ stopAllActions];
 	[template_ onExit];
 	
+	//Prepare animation
 	CGSize winSize = [[CCDirector sharedDirector] winSize];
-	if(animate)
+	if(currentNotification_.animated)
 	{
 		if(position_==kCCNotificationPositionBottom){
 			[template_ setAnchorPoint:ccp(0.5f, 0)];
@@ -313,43 +412,17 @@ static CCNotifications *sharedManager;
 		}
 		[self _startScheduler];
 	}
-	[template_ setTitle:title message:message texture:texture];
+	
+	//Update template
+	[template_ setTitle:[currentNotification_ title] message:[currentNotification_ message] texture:texture];
 	[template_ setVisible:YES];
-}
-
-- (void) addWithTitle:(NSString*)title message:(NSString*)message image:(NSString*)image tag:(int)tag animate:(BOOL)animate
-{
-	CCTexture2D *texture = (image==nil) ? nil : [[CCTextureCache sharedTextureCache] addImage:image];
-	[self addWithTitle:title message:message texture:texture tag:tag animate:animate];
-}
-
-- (void) _addFromSafelyMode
-{
-	ccNotificationData *data = self.cachedNotificationData;
-	if(data)
-	{
-		[self addWithTitle:data.title message:data.message image:data.image tag:data.tag animate:data.animated];
-		self.cachedNotificationData = nil;
-	}
-}
-
-- (void) addSafelyWithTitle:(NSString*)title message:(NSString*)message image:(NSString*)image tag:(int)tag animate:(BOOL)animate
-{
-	ccNotificationData *data = [[ccNotificationData alloc] init];
-	data.title		= title;
-	data.message	= message;
-	data.image		= image;
-	data.tag		= tag;
-	data.animated	= animate;
-	self.cachedNotificationData = data; //2 retains
-	[data release]; //1 retain
 }
 
 #pragma mark Touch Events
 
 - (void) registerWithTouchDispatcher
 {
-	[[CCTouchDispatcher sharedDispatcher] addStandardDelegate:self priority:INT_MIN+3];
+	[[CCTouchDispatcher sharedDispatcher] addStandardDelegate:self priority:INT_MIN];
 }
 
 - (void) ccTouchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
@@ -358,17 +431,14 @@ static CCNotifications *sharedManager;
 	CGPoint point = [[CCDirector sharedDirector] convertToGL:[touch locationInView:[touch view]]];
 	CGRect rect = [template_ boundingBox];
 	if(CGRectContainsPoint(rect, point))
-		if([delegate_ respondsToSelector:@selector(touched:)] && [delegate_ touched:tag_])
+		if([delegate_ respondsToSelector:@selector(touched:)] && [delegate_ touched:[currentNotification_ tag]])
 			[self _hideNotificationScheduler];
 }
 
 #pragma mark Other methods
 
 - (void) visit
-{
-	if(cachedNotificationData_)
-		[self _addFromSafelyMode];
-	
+{	
 	[template_ visit];
 }
 
@@ -382,11 +452,11 @@ static CCNotifications *sharedManager;
 	CCLOG(@"cocos2d: deallocing %@", self);
 	
 	sharedManager = nil;
+	[cachedNotifications_ release];
 	[self setNotificationDesign:nil];
 	[self setDelegate:nil];
 	[self setAnimationIn:nil];
 	[self setAnimationOut:nil];
-	[self setCachedNotificationData:nil];
 	[super dealloc];
 }
 @end

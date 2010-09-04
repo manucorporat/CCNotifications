@@ -69,9 +69,10 @@
 		CCMenuItemToggle *outOptions = [CCMenuItemToggle itemWithTarget:self selector:@selector(setAnimationOut:) items:outAnimationMove, outAnimationScale, nil];
 		
 		//Button
-		CCMenuItem *send = [CCMenuItemFont itemFromString:@"Send notification" target:self selector:@selector(send:)];
+		CCMenuItem *sendCached = [CCMenuItemFont itemFromString:@"Send notification cached" target:self selector:@selector(sendCached:)];
+		CCMenuItem *sendNoCached = [CCMenuItemFont itemFromString:@"Send notification no cached" target:self selector:@selector(sendNoCached:)];
 		
-		CCMenu *menu = [CCMenu menuWithItems:positionOptions, inOptions, outOptions, send, nil];
+		CCMenu *menu = [CCMenu menuWithItems:positionOptions, inOptions, outOptions, sendCached, sendNoCached, nil];
 		[menu alignItemsVerticallyWithPadding:15];
 		[menu setPosition:ccp(size.width/2.0f+30, size.height/2.0f)];
 		// add the label as a child to this Layer
@@ -87,9 +88,7 @@
 
 - (void) setNotPosition:(id)sender
 {
-	//[[CCNotifications sharedManager] setPosition:[[sender selectedItem] tag]];
 	[[CCNotifications sharedManager] setPosition:[sender selectedIndex]];
-
 }
 
 - (void) setAnimationIn:(id)sender
@@ -103,9 +102,19 @@
 	[[CCNotifications sharedManager] setAnimationOut:[sender selectedIndex] time:0.5f];
 }
 
-- (void) send:(id)sender
+- (void) sendCached:(id)sender
 {
-	[[CCNotifications sharedManager] addSafelyWithTitle:@"Notification sample" message:@"Hi my friend, this is a exmaple" image:nil tag:-1 animate:YES];
+	//Fast method
+	[[CCNotifications sharedManager] addWithTitle:@"Notification sample" message:@"I wait until done" image:nil];
+	
+	//Complex method
+	//[[CCNotifications sharedManager] addWithTitle:@"Notification sample" message:@"I wait until done" image:nil tag:-1 animate:YES waitUntilDone:YES];
+}
+
+- (void) sendNoCached:(id)sender
+{
+	//Complex method
+	[[CCNotifications sharedManager] addWithTitle:@"Notification sample" message:@"I don't wait until done" image:nil tag:-1 animate:YES waitUntilDone:NO];
 }
 
 

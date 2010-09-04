@@ -11,8 +11,27 @@
 
 #define KNOTIFICATIONMIN_SCALE 0.0001f
 
+@interface ccNotificationData : NSObject
+{
+	NSString *title_;
+	NSString *message_;
+	id media_;
+	int mediaType_;
+	int tag_;
+	BOOL animated_;
+}
+@property(nonatomic, retain) NSString *title;
+@property(nonatomic, retain) NSString *message;
+@property(nonatomic, retain) id media;
+@property(nonatomic, readwrite, assign) int mediaType;
+@property(nonatomic, readwrite, assign) int tag;
+@property(nonatomic, readwrite, assign) BOOL animated;
+
+@end
+
 @protocol CCNotificationsDelegate <NSObject>
 @optional
+- (void) notification:(ccNotificationData*)notification newState:(char)state;
 - (void) notificationChangeState:(char)state tag:(int)tag;
 - (BOOL) touched:(int)tag;
 @end
@@ -41,36 +60,27 @@ enum
 	kCCNotificationAnimationScale,
 };
 
-@interface ccNotificationData : NSObject
+enum
 {
-	NSString *title_;
-	NSString *message_;
-	NSString *image_;
-	int tag_;
-	BOOL animated_;
-}
-@property(nonatomic, retain) NSString *title;
-@property(nonatomic, retain) NSString *message;
-@property(nonatomic, retain) NSString *image;
-@property(nonatomic, readwrite, assign) int tag;
-@property(nonatomic, readwrite, assign) BOOL animated;
-
-@end
+	kCCNotificationMediaPath,
+	kCCNotificationMediaTexture,
+};
 
 @interface CCNotifications : NSObject <CCStandardTouchDelegate>
 {
 	id <CCNotificationsDelegate>			delegate_;
 	CCNode <CCNotificationDesignProtocol>	*template_;
-	ccNotificationData						*cachedNotificationData_;
 	char									state_;
 	char									position_;
-	int										tag_;
 	ccTime									showingTime_;
 	ccTime									timeAnimationIn_;
 	ccTime									timeAnimationOut_;
 	char									typeAnimationIn_;
 	char									typeAnimationOut_;
-	BOOL									animated_;
+	
+	//Caching
+	CCArray									*cachedNotifications_;
+	ccNotificationData						*currentNotification_;
 	
 	CCIntervalAction						*animationIn_;
 	CCIntervalAction						*animationOut_;
@@ -79,7 +89,7 @@ enum
 @property(nonatomic, retain) CCNode <CCNotificationDesignProtocol> *notificationDesign;
 @property(nonatomic, retain) CCIntervalAction *animationIn;
 @property(nonatomic, retain) CCIntervalAction *animationOut;
-@property(nonatomic, retain) ccNotificationData *cachedNotificationData;
+@property(nonatomic, retain) ccNotificationData *currentNotification;
 @property(nonatomic, readwrite, assign) char position;
 @property(nonatomic, readwrite, assign) ccTime showingTime;
 
@@ -92,8 +102,18 @@ enum
 - (void) setAnimationOut:(char)type time:(ccTime)time;
 - (void) setAnimation:(char)type time:(ccTime)time;
 - (void) updateAnimations;
-- (void) addSafelyWithTitle:(NSString*)title message:(NSString*)message image:(NSString*)image tag:(int)tag animate:(BOOL)animate;
-- (void) addWithTitle:(NSString*)title message:(NSString*)message texture:(CCTexture2D*)texture tag:(int)tag animate:(BOOL)animate;
-- (void) addWithTitle:(NSString*)title message:(NSString*)message image:(NSString*)image tag:(int)tag animate:(BOOL)animate;
+
+- (ccNotificationData*) addWithTitle:(NSString*)title message:(NSString*)message image:(NSString*)image tag:(int)tag animate:(BOOL)animate waitUntilDone:(BOOL)isCached;
+- (ccNotificationData*) addWithTitle:(NSString*)title message:(NSString*)message texture:(CCTexture2D*)texture tag:(int)tag animate:(BOOL)animate waitUntilDone:(BOOL)isCached;
+
+- (ccNotificationData*) addWithTitle:(NSString*)title message:(NSString*)message image:(NSString*)image tag:(int)tag animate:(BOOL)animate;
+- (ccNotificationData*) addWithTitle:(NSString*)title message:(NSString*)message texture:(CCTexture2D*)texture tag:(int)tag animate:(BOOL)animate;
+
+- (ccNotificationData*) addWithTitle:(NSString*)title message:(NSString*)message image:(NSString*)image;
+- (ccNotificationData*) addWithTitle:(NSString*)title message:(NSString*)message texture:(CCTexture2D*)texture;
+
+- (void) addSafelyWithTitle:(NSString*)title message:(NSString*)message image:(NSString*)image tag:(int)tag animate:(BOOL)animate DEPRECATED_ATTRIBUTE;
+
+
 - (void) visit;
 @end
