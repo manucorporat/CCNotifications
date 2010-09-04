@@ -32,8 +32,8 @@
 @protocol CCNotificationsDelegate <NSObject>
 @optional
 - (void) notification:(ccNotificationData*)notification newState:(char)state;
-- (void) notificationChangeState:(char)state tag:(int)tag;
 - (BOOL) touched:(int)tag;
+- (void) notificationChangeState:(char)state tag:(int)tag DEPRECATED_ATTRIBUTE;
 @end
 
 @protocol CCNotificationDesignProtocol <NSObject>

@@ -104,7 +104,7 @@
 
 - (void) sendCached:(id)sender
 {
-	//Fast method
+	//Easy method
 	[[CCNotifications sharedManager] addWithTitle:@"Notification sample" message:@"I wait until done" image:nil];
 	
 	//Complex method
