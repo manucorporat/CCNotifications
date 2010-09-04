@@ -452,6 +452,7 @@ static CCNotifications *sharedManager;
 	
 	sharedManager = nil;
 	[cachedNotifications_ release];
+	[self setCurrentNotification:nil];
 	[self setNotificationDesign:nil];
 	[self setDelegate:nil];
 	[self setAnimationIn:nil];
