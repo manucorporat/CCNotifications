@@ -25,7 +25,6 @@
 	[self setTitle:nil];
 	[self setMessage:nil];
 	[self setMedia:nil];
-	NSLog(@"Dealloc");
 	[super dealloc];
 }
 
