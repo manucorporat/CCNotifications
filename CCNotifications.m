@@ -35,7 +35,7 @@
 
 - (void) _updateAnimationIn;
 - (void) _updateAnimationOut;
-- (CCIntervalAction*) _animation:(char)type time:(ccTime)time;
+- (CCActionInterval*) _animation:(char)type time:(ccTime)time;
 - (void) _showNotification;
 - (void) _addNotificationToArray:(ccNotificationData*)data cached:(BOOL)isCached;
 - (void) _startScheduler;
@@ -156,9 +156,9 @@ static CCNotifications *sharedManager;
 }
 #pragma mark Notification Actions
 
-- (CCIntervalAction*) _animation:(char)type time:(ccTime)time
+- (CCActionInterval*) _animation:(char)type time:(ccTime)time
 {
-	CCIntervalAction *action = nil;
+	CCActionInterval *action = nil;
 	switch (type){
 		case kCCNotificationAnimationMovement:
 			if(position_==kCCNotificationPositionBottom)
@@ -184,7 +184,7 @@ static CCNotifications *sharedManager;
 
 - (void) _updateAnimationOut
 {
-	CCIntervalAction *tempAction = [self _animation:typeAnimationOut_ time:timeAnimationOut_];
+	CCActionInterval *tempAction = [self _animation:typeAnimationOut_ time:timeAnimationOut_];
 	self.animationOut = [CCSequence actionOne:[tempAction reverse] two:[CCCallFunc actionWithTarget:self selector:@selector(_hideNotification)]];
 }
 
