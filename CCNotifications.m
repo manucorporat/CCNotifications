@@ -432,7 +432,7 @@ static CCNotifications *sharedManager;
 
 #pragma mark Touch Events
 
-#ifdef AWIPADVERSION
+#ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
 - (void) registerWithTouchDispatcher
 {
 	//[[CCEventDispatcher sharedDispatcher] addMouseDelegate:self priority:[self mouseDelegatePriority]];
