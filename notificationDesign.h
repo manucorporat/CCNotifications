@@ -12,8 +12,8 @@
 
 @interface CCNotificationDefaultDesign : CCColorLayer <CCNotificationDesignProtocol>
 {
-	CCLabel *title_;
-	CCLabel *message_;
+	CCLabelTTF *title_;
+	CCLabelTTF *message_;
 	CCSprite *image_;
 }
 

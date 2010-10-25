@@ -15,12 +15,12 @@
 	CGSize size = [[CCDirector sharedDirector] winSize];
 	self = [self initWithColor:ccc4(42, 68, 148, 180) width:size.width height:38];
 	if (self != nil) {
-		title_ = [CCLabel labelWithString:@" " fontName:@"Arial" fontSize:12];
+		title_ = [CCLabelTTF labelWithString:@" " fontName:@"Arial" fontSize:12];
 		[title_ setIsRelativeAnchorPoint:NO];
 		[title_ setAnchorPoint:CGPointZero];
 		[title_ setPosition:ccp(52, 20)];
 		
-		message_ = [CCLabel labelWithString:@" " fontName:@"Arial" fontSize:15];
+		message_ = [CCLabelTTF labelWithString:@" " fontName:@"Arial" fontSize:15];
 		[message_ setIsRelativeAnchorPoint:NO];
 		[message_ setAnchorPoint:CGPointZero];
 		[message_ setPosition:ccp(52, 3)];

@@ -35,7 +35,7 @@
 
 - (void) _updateAnimationIn;
 - (void) _updateAnimationOut;
-- (CCIntervalAction*) _animation:(char)type time:(ccTime)time;
+- (CCActionInterval*) _animation:(char)type time:(ccTime)time;
 - (void) _showNotification;
 - (void) _addNotificationToArray:(ccNotificationData*)data cached:(BOOL)isCached;
 - (void) _startScheduler;
@@ -142,7 +142,11 @@ static CCNotifications *sharedManager;
 
 	if(state_==kCCNotificationStateShowing)
 	{
+#ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
 		[[CCTouchDispatcher sharedDispatcher] removeDelegate:self];
+#else
+		[[CCEventDispatcher sharedDispatcher] removeMouseDelegate:self];
+#endif
 		[[CCScheduler sharedScheduler] unscheduleSelector:@selector(_hideNotificationScheduler) forTarget:self];		
 	}
 	
@@ -156,9 +160,9 @@ static CCNotifications *sharedManager;
 }
 #pragma mark Notification Actions
 
-- (CCIntervalAction*) _animation:(char)type time:(ccTime)time
+- (CCActionInterval*) _animation:(char)type time:(ccTime)time
 {
-	CCIntervalAction *action = nil;
+	CCActionInterval *action = nil;
 	switch (type){
 		case kCCNotificationAnimationMovement:
 			if(position_==kCCNotificationPositionBottom)
@@ -184,7 +188,7 @@ static CCNotifications *sharedManager;
 
 - (void) _updateAnimationOut
 {
-	CCIntervalAction *tempAction = [self _animation:typeAnimationOut_ time:timeAnimationOut_];
+	CCActionInterval *tempAction = [self _animation:typeAnimationOut_ time:timeAnimationOut_];
 	self.animationOut = [CCSequence actionOne:[tempAction reverse] two:[CCCallFunc actionWithTarget:self selector:@selector(_hideNotification)]];
 }
 
@@ -242,7 +246,11 @@ static CCNotifications *sharedManager;
 
 - (void) _hideNotificationScheduler
 {	
+#ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
 	[[CCTouchDispatcher sharedDispatcher] removeDelegate:self];
+#else
+	[[CCEventDispatcher sharedDispatcher] removeMouseDelegate:self];
+#endif
 	[[CCScheduler sharedScheduler] unscheduleSelector:@selector(_hideNotificationScheduler) forTarget:self];
 	if([currentNotification_ animated])
 	{
@@ -329,7 +337,6 @@ static CCNotifications *sharedManager;
 	[self addWithTitle:title message:message image:image tag:tag animate:animate waitUntilDone:YES];
 }
 
-
 - (void) _showNotification
 {
 	if([cachedNotifications_ count]==0) return;
@@ -338,7 +345,13 @@ static CCNotifications *sharedManager;
 	
 	//Stop system
 	if(state_==kCCNotificationStateShowing)
+	{
+#ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
 		[[CCTouchDispatcher sharedDispatcher] removeDelegate:self];
+#else
+		[[CCEventDispatcher sharedDispatcher] removeMouseDelegate:self];
+#endif
+	}
 	
 	if(state_!=kCCNotificationStateHide)
 	{
@@ -419,8 +432,10 @@ static CCNotifications *sharedManager;
 
 #pragma mark Touch Events
 
+#ifdef AWIPADVERSION
 - (void) registerWithTouchDispatcher
 {
+	//[[CCEventDispatcher sharedDispatcher] addMouseDelegate:self priority:[self mouseDelegatePriority]];
 	[[CCTouchDispatcher sharedDispatcher] addStandardDelegate:self priority:INT_MIN];
 }
 
@@ -433,8 +448,10 @@ static CCNotifications *sharedManager;
 		if([delegate_ respondsToSelector:@selector(touched:)] && [delegate_ touched:[currentNotification_ tag]])
 			[self _hideNotificationScheduler];
 }
+#endif
 
 #pragma mark Other methods
+
 
 - (void) visit
 {	

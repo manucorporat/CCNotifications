@@ -66,7 +66,11 @@ enum
 	kCCNotificationMediaTexture,
 };
 
+#ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
 @interface CCNotifications : NSObject <CCStandardTouchDelegate>
+#elif defined(__MAC_OS_X_VERSION_MAX_ALLOWED)
+@interface CCNotifications : NSObject <CCKeyboardEventDelegate, CCMouseEventDelegate>
+#endif
 {
 	id <CCNotificationsDelegate>			delegate_;
 	CCNode <CCNotificationDesignProtocol>	*template_;
@@ -82,13 +86,13 @@ enum
 	CCArray									*cachedNotifications_;
 	ccNotificationData						*currentNotification_;
 	
-	CCIntervalAction						*animationIn_;
-	CCIntervalAction						*animationOut_;
+	CCActionInterval						*animationIn_;
+	CCActionInterval						*animationOut_;
 }
 @property(nonatomic, retain) id <CCNotificationsDelegate> delegate;
 @property(nonatomic, retain) CCNode <CCNotificationDesignProtocol> *notificationDesign;
-@property(nonatomic, retain) CCIntervalAction *animationIn;
-@property(nonatomic, retain) CCIntervalAction *animationOut;
+@property(nonatomic, retain) CCActionInterval *animationIn;
+@property(nonatomic, retain) CCActionInterval *animationOut;
 @property(nonatomic, retain) ccNotificationData *currentNotification;
 @property(nonatomic, readwrite, assign) char position;
 @property(nonatomic, readwrite, assign) ccTime showingTime;

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1165A622123297450081B8FE /* CCDirector+CCNotifications.m in Sources */ = {isa = PBXBuildFile; fileRef = 1165A621123297450081B8FE /* CCDirector+CCNotifications.m */; };
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		1F3B9A2D0EF2145700286867 /* SampleAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F3B9A2B0EF2145700286867 /* SampleAppDelegate.m */; };
 		504DFBCE10AF12E9006D82FE /* CLScoreServerPost.h in Headers */ = {isa = PBXBuildFile; fileRef = 504DFBC810AF12E9006D82FE /* CLScoreServerPost.h */; };
@@ -238,6 +239,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1165A620123297450081B8FE /* CCDirector+CCNotifications.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "CCDirector+CCNotifications.h"; path = "../CCDirector+CCNotifications.h"; sourceTree = SOURCE_ROOT; };
+		1165A621123297450081B8FE /* CCDirector+CCNotifications.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "CCDirector+CCNotifications.m"; path = "../CCDirector+CCNotifications.m"; sourceTree = SOURCE_ROOT; };
 		1D6058910D05DD3D006BFB54 /* Sample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F3B9A2B0EF2145700286867 /* SampleAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SampleAppDelegate.m; path = Classes/SampleAppDelegate.m; sourceTree = SOURCE_ROOT; };
 		1F3B9A2C0EF2145700286867 /* SampleAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SampleAppDelegate.h; path = Classes/SampleAppDelegate.h; sourceTree = SOURCE_ROOT; };
@@ -839,6 +842,8 @@
 		99E96F7D11EB608A00A52C62 /* CCNotifications */ = {
 			isa = PBXGroup;
 			children = (
+				1165A620123297450081B8FE /* CCDirector+CCNotifications.h */,
+				1165A621123297450081B8FE /* CCDirector+CCNotifications.m */,
 				99E96F7711EB608600A52C62 /* CCNotifications.h */,
 				99E96F7811EB608600A52C62 /* CCNotifications.m */,
 				99E96F7911EB608600A52C62 /* notificationDesign.h */,
@@ -1039,6 +1044,7 @@
 				506EDC31102F528A00A389B3 /* HelloWorldScene.m in Sources */,
 				99E96F7B11EB608600A52C62 /* CCNotifications.m in Sources */,
 				99E96F7C11EB608600A52C62 /* notificationDesign.m in Sources */,
+				1165A622123297450081B8FE /* CCDirector+CCNotifications.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
