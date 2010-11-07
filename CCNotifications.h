@@ -60,7 +60,7 @@
 
 enum
 {
-	kCCNotificationStateHide = 0,
+	kCCNotificationStateHide,
 	kCCNotificationStateAnimationOut,
 	kCCNotificationStateShowing,
 	kCCNotificationStateAnimationIn,
@@ -68,13 +68,13 @@ enum
 
 enum
 {
-	kCCNotificationPositionBottom = 0,
+	kCCNotificationPositionBottom,
 	kCCNotificationPositionTop,
 };
 
 enum
 {
-	kCCNotificationAnimationMovement = 0,
+	kCCNotificationAnimationMovement,
 	kCCNotificationAnimationScale,
 };
 
@@ -87,7 +87,7 @@ enum
 #ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
 @interface CCNotifications : NSObject <CCStandardTouchDelegate>
 #elif defined(__MAC_OS_X_VERSION_MAX_ALLOWED)
-@interface CCNotifications : NSObject <CCKeyboardEventDelegate, CCMouseEventDelegate>
+@interface CCNotifications : NSObject
 #endif
 {
 	id <CCNotificationsDelegate>			delegate_;

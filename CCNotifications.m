@@ -107,9 +107,9 @@ static CCNotifications *sharedManager;
 - (id) init
 {
 	CCNode <CCNotificationDesignProtocol> *templates = [[[CCNotificationDefaultDesign alloc] init] autorelease];
-	return self = [self initWithTemplate:templates];
+	self = [self initWithTemplate:templates];
+	return self;
 }
-
 
 - (id) initWithTemplate:(CCNode <CCNotificationDesignProtocol> *)templates
 {
@@ -163,8 +163,6 @@ static CCNotifications *sharedManager;
 	{
 #ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
 		[[CCTouchDispatcher sharedDispatcher] removeDelegate:self];
-#else
-		[[CCEventDispatcher sharedDispatcher] removeMouseDelegate:self];
 #endif
 		[[CCScheduler sharedScheduler] unscheduleSelector:@selector(_hideNotificationScheduler) forTarget:self];		
 	}
@@ -242,7 +240,9 @@ static CCNotifications *sharedManager;
 
 - (void) _startScheduler
 {
+#ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
 	[self registerWithTouchDispatcher];
+#endif
 	[self _setState:kCCNotificationStateShowing];
 	[template_ stopAllActions];
 	[[CCScheduler sharedScheduler] scheduleSelector:@selector(_hideNotificationScheduler) forTarget:self interval:showingTime_ paused:NO];
@@ -267,8 +267,6 @@ static CCNotifications *sharedManager;
 {	
 #ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
 	[[CCTouchDispatcher sharedDispatcher] removeDelegate:self];
-#else
-	[[CCEventDispatcher sharedDispatcher] removeMouseDelegate:self];
 #endif
 	[[CCScheduler sharedScheduler] unscheduleSelector:@selector(_hideNotificationScheduler) forTarget:self];
 	if([currentNotification_ animated])
@@ -454,7 +452,6 @@ static CCNotifications *sharedManager;
 #ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
 - (void) registerWithTouchDispatcher
 {
-	//[[CCEventDispatcher sharedDispatcher] addMouseDelegate:self priority:[self mouseDelegatePriority]];
 	[[CCTouchDispatcher sharedDispatcher] addStandardDelegate:self priority:INT_MIN];
 }
 
@@ -470,7 +467,6 @@ static CCNotifications *sharedManager;
 #endif
 
 #pragma mark Other methods
-
 
 - (void) visit
 {	
