@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		11386F5C1275E82D00A854B2 /* CCNotifications.m in Sources */ = {isa = PBXBuildFile; fileRef = 11386F591275E82D00A854B2 /* CCNotifications.m */; };
-		11386F5D1275E82D00A854B2 /* notificationDesign.m in Sources */ = {isa = PBXBuildFile; fileRef = 11386F5B1275E82D00A854B2 /* notificationDesign.m */; };
 		1138723F1275EA6C00A854B2 /* CCAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 1138715E1275EA6C00A854B2 /* CCAction.h */; };
 		113872401275EA6C00A854B2 /* CCAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 1138715F1275EA6C00A854B2 /* CCAction.m */; };
 		113872411275EA6C00A854B2 /* CCActionCamera.h in Headers */ = {isa = PBXBuildFile; fileRef = 113871601275EA6C00A854B2 /* CCActionCamera.h */; };
@@ -207,6 +205,8 @@
 		113873021275EA6C00A854B2 /* CJSONScanner.m in Sources */ = {isa = PBXBuildFile; fileRef = 1138723C1275EA6C00A854B2 /* CJSONScanner.m */; };
 		113873031275EA6C00A854B2 /* CJSONSerializer.h in Headers */ = {isa = PBXBuildFile; fileRef = 1138723D1275EA6C00A854B2 /* CJSONSerializer.h */; };
 		113873041275EA6C00A854B2 /* CJSONSerializer.m in Sources */ = {isa = PBXBuildFile; fileRef = 1138723E1275EA6C00A854B2 /* CJSONSerializer.m */; };
+		113EE3BA12C1608D00309F0E /* CCNotifications.m in Sources */ = {isa = PBXBuildFile; fileRef = 113EE3B712C1608D00309F0E /* CCNotifications.m */; };
+		113EE3BB12C1608D00309F0E /* notificationDesign.m in Sources */ = {isa = PBXBuildFile; fileRef = 113EE3B912C1608D00309F0E /* notificationDesign.m */; };
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		1F3B9A2D0EF2145700286867 /* CCNotificationsAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F3B9A2B0EF2145700286867 /* CCNotificationsAppDelegate.m */; };
 		505574581045D68500A31725 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 506EDBA4102F4C9F00A389B3 /* AVFoundation.framework */; };
@@ -243,10 +243,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		11386F581275E82D00A854B2 /* CCNotifications.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CCNotifications.h; path = ../CCNotifications.h; sourceTree = SOURCE_ROOT; };
-		11386F591275E82D00A854B2 /* CCNotifications.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CCNotifications.m; path = ../CCNotifications.m; sourceTree = SOURCE_ROOT; };
-		11386F5A1275E82D00A854B2 /* notificationDesign.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = notificationDesign.h; path = ../notificationDesign.h; sourceTree = SOURCE_ROOT; };
-		11386F5B1275E82D00A854B2 /* notificationDesign.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = notificationDesign.m; path = ../notificationDesign.m; sourceTree = SOURCE_ROOT; };
 		1138715E1275EA6C00A854B2 /* CCAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCAction.h; sourceTree = "<group>"; };
 		1138715F1275EA6C00A854B2 /* CCAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCAction.m; sourceTree = "<group>"; };
 		113871601275EA6C00A854B2 /* CCActionCamera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCActionCamera.h; sourceTree = "<group>"; };
@@ -446,6 +442,10 @@
 		1138723C1275EA6C00A854B2 /* CJSONScanner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CJSONScanner.m; sourceTree = "<group>"; };
 		1138723D1275EA6C00A854B2 /* CJSONSerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CJSONSerializer.h; sourceTree = "<group>"; };
 		1138723E1275EA6C00A854B2 /* CJSONSerializer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CJSONSerializer.m; sourceTree = "<group>"; };
+		113EE3B612C1608D00309F0E /* CCNotifications.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCNotifications.h; sourceTree = "<group>"; };
+		113EE3B712C1608D00309F0E /* CCNotifications.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCNotifications.m; sourceTree = "<group>"; };
+		113EE3B812C1608D00309F0E /* notificationDesign.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = notificationDesign.h; sourceTree = "<group>"; };
+		113EE3B912C1608D00309F0E /* notificationDesign.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = notificationDesign.m; sourceTree = "<group>"; };
 		1D6058910D05DD3D006BFB54 /* CCNotifications.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CCNotifications.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F3B9A2B0EF2145700286867 /* CCNotificationsAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CCNotificationsAppDelegate.m; path = Classes/CCNotificationsAppDelegate.m; sourceTree = SOURCE_ROOT; };
 		1F3B9A2C0EF2145700286867 /* CCNotificationsAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CCNotificationsAppDelegate.h; path = Classes/CCNotificationsAppDelegate.h; sourceTree = SOURCE_ROOT; };
@@ -506,17 +506,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		11386F5E1275E83200A854B2 /* CCNotifications */ = {
-			isa = PBXGroup;
-			children = (
-				11386F581275E82D00A854B2 /* CCNotifications.h */,
-				11386F591275E82D00A854B2 /* CCNotifications.m */,
-				11386F5A1275E82D00A854B2 /* notificationDesign.h */,
-				11386F5B1275E82D00A854B2 /* notificationDesign.m */,
-			);
-			name = CCNotifications;
-			sourceTree = "<group>";
-		};
 		1138715C1275EA6C00A854B2 /* libs */ = {
 			isa = PBXGroup;
 			children = (
@@ -939,6 +928,18 @@
 			path = JSON;
 			sourceTree = "<group>";
 		};
+		113EE3B512C1608D00309F0E /* CCNotifications */ = {
+			isa = PBXGroup;
+			children = (
+				113EE3B612C1608D00309F0E /* CCNotifications.h */,
+				113EE3B712C1608D00309F0E /* CCNotifications.m */,
+				113EE3B812C1608D00309F0E /* notificationDesign.h */,
+				113EE3B912C1608D00309F0E /* notificationDesign.m */,
+			);
+			name = CCNotifications;
+			path = ../CCNotifications;
+			sourceTree = SOURCE_ROOT;
+		};
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -951,8 +952,8 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				113EE3B512C1608D00309F0E /* CCNotifications */,
 				1138715C1275EA6C00A854B2 /* libs */,
-				11386F5E1275E83200A854B2 /* CCNotifications */,
 				504DFC6810AF1739006D82FE /* LICENSE.cocos2d */,
 				504DFC6910AF1739006D82FE /* LICENSE.cocosdenshion */,
 				2D500B1D0D5A766B00DBA0E3 /* Classes */,
@@ -1211,8 +1212,8 @@
 				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
 				1F3B9A2D0EF2145700286867 /* CCNotificationsAppDelegate.m in Sources */,
 				506EDC31102F528A00A389B3 /* HelloWorldScene.m in Sources */,
-				11386F5C1275E82D00A854B2 /* CCNotifications.m in Sources */,
-				11386F5D1275E82D00A854B2 /* notificationDesign.m in Sources */,
+				113EE3BA12C1608D00309F0E /* CCNotifications.m in Sources */,
+				113EE3BB12C1608D00309F0E /* notificationDesign.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
